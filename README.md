@@ -11,7 +11,7 @@
 [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
-[Live Demo](#) · [Report Bug](https://github.com/gibsongelera/ZPPSU-DRRMO/issues) · [Request Feature](https://github.com/gibsongelera/ZPPSU-DRRMO/issues)
+[Live Demo](https://gibsongelera.github.io/ZPPSU-DRRMO/) · [Report Bug](https://github.com/gibsongelera/ZPPSU-DRRMO/issues) · [Request Feature](https://github.com/gibsongelera/ZPPSU-DRRMO/issues)
 
 </div>
 
