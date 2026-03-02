@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="rgb(40,9,5)">
+  <title>Admin Dashboard — ZPPSU DRRMO System</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── Admin extras ── */
+    body { overflow-x: hidden; }
+
+    /* Login Gate */
+    .login-gate {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, rgb(40,9,5) 0%, rgb(116,10,3) 60%, rgb(160,14,8) 100%);
+      z-index: 9000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+    }
+    .login-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: var(--radius);
+      padding: 36px 30px;
+      width: 100%; max-width: 400px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+    .login-logos {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin-bottom: 16px;
+    }
+    .login-logo {
+      width: 64px; height: 64px; object-fit: contain;
+      background: transparent;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,.55));
+    }
+    .login-logo-div { width: 1px; height: 46px; background: rgba(255,255,255,.25); }
+    .login-card h2 { color: #fff; font-size: 21px; font-weight: 800; margin-bottom: 4px; }
+    .login-card p  { color: rgba(255,255,255,.5); font-size: 13px; margin-bottom: 26px; }
+    .login-form .form-group { text-align: left; margin-bottom: 14px; }
+    .login-form .form-label { color: rgba(255,255,255,.55); }
+    .login-form .form-control {
+      background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.15); color: #fff;
+    }
+    .login-form .form-control:focus {
+      border-color: var(--blue); background: rgba(255,255,255,.12);
+      box-shadow: 0 0 0 3px rgba(230,80,27,.2);
+    }
+    .login-form .form-control::placeholder { color: rgba(255,255,255,.3); }
+    .login-hint { margin-top: 12px; font-size: 11px; color: rgba(255,255,255,.28); }
+    .login-hint strong { color: rgba(255,255,255,.45); }
+    .login-error {
+      color: #ffb3b3; font-size: 13px; margin-bottom: 12px;
+      text-align: left; display: none; padding: 8px 12px;
+      background: rgba(183,28,28,.3); border-radius: var(--radius-sm);
+      border: 1px solid rgba(239,154,154,.3);
+    }
+
+    /* Analytics metric cards */
+    .analytics-metrics {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .metric-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 12px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--m-color, var(--navy-light));
+    }
+    .metric-val  { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+    .metric-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 4px; line-height: 1.3; }
+    .metric-card.m-maroon { --m-color: var(--navy-light); }
+    .metric-card.m-orange { --m-color: var(--blue); }
+    .metric-card.m-green  { --m-color: var(--priority-general); }
+    .metric-card.m-red    { --m-color: var(--priority-critical); }
+    .metric-card.m-yellow { --m-color: var(--priority-warning); }
+    .metric-card.m-blue   { --m-color: #1565c0; }
+
+    /* Settings */
+    .settings-section { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 768px) { .settings-section { grid-template-columns: 1fr; } }
+
+    /* Panel announce form layout on desktop */
+    .ann-form-inner {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 22px;
+    }
+    @media (max-width: 960px) { .ann-form-inner { grid-template-columns: 1fr; } }
+
+    /* Item search in admin */
+    .admin-item-search-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 0;
+    }
+    .admin-item-search-row .search-wrap {
+      position: relative; flex: 1; min-width: 160px;
+    }
+    .admin-item-search-row .search-wrap span {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; font-size: 13px; color: var(--text-light);
+    }
+    .admin-item-search-row input { padding-left: 32px; }
+
+    /* Analytics responsive */
+    @media (max-width: 900px) {
+      .analytics-metrics { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .analytics-metrics { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN GATE ══ -->
+<div class="login-gate" id="login-gate" role="dialog" aria-modal="true" aria-labelledby="login-title">
+  <div class="login-card">
+    <div class="login-logos">
+      <img src="assets/zppsu-logo.png" alt="ZPPSU" class="login-logo">
+      <div class="login-logo-div"></div>
+      <img src="assets/drrmo-logo.png" alt="DRRMO" class="login-logo">
+    </div>
+    <h2 id="login-title">DRRMO Admin Portal</h2>
+    <p>ZPPSU — Authorized Personnel Only</p>
+    <form class="login-form" id="login-form" novalidate>
+      <div id="login-error" class="login-error">⚠️ Invalid credentials. Please try again.</div>
+      <div class="form-group">
+        <label class="form-label" for="login-username">Username</label>
+        <input type="text" id="login-username" class="form-control" placeholder="Enter username"
+          autocomplete="username" required inputmode="text">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="login-password">Password</label>
+        <input type="password" id="login-password" class="form-control" placeholder="Enter password"
+          autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;margin-top:4px">
+        🔐 Sign In to Dashboard
+      </button>
+    </form>
+    <p class="login-hint">Demo: <strong>admin</strong> / <strong>drrmo2026</strong></p>
+  </div>
+</div>
+
+<!-- ══ ADMIN DASHBOARD ══ -->
+<div id="admin-dashboard" style="display:none">
+
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="admin-sidebar" id="admin-sidebar" role="navigation" aria-label="Admin navigation">
+    <div class="sidebar-brand">
+      <div class="sidebar-logos">
+        <img src="assets/zppsu-logo.png" alt="ZPPSU" class="sidebar-logo">
+        <div class="sidebar-logo-div"></div>
+        <img src="assets/drrmo-logo.png" alt="DRRMO" class="sidebar-logo">
+      </div>
+      <div class="sidebar-brand-text">
+        <div class="sidebar-org">ZPPSU DRRMO</div>
+        <div class="sidebar-name">Admin Portal</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <div class="nav-item active" data-section="overview"       role="button" tabindex="0">
+        <span class="nav-icon">📊</span> Overview
+      </div>
+      <div class="nav-item" data-section="analytics"             role="button" tabindex="0">
+        <span class="nav-icon">📈</span> Analytics
+      </div>
+      <div class="nav-item" data-section="announcements"         role="button" tabindex="0">
+        <span class="nav-icon">📢</span> Announcements
+        <span class="nav-badge" id="ann-nav-badge">5</span>
+      </div>
+      <div class="nav-item" data-section="items"                 role="button" tabindex="0">
+        <span class="nav-icon">📦</span> Lost Items
+      </div>
+      <div class="nav-section-label">System</div>
+      <div class="nav-item" data-section="settings"              role="button" tabindex="0">
+        <span class="nav-icon">⚙️</span> Settings
+      </div>
+      <a class="nav-item" href="index.html" aria-label="User portal">
+        <span class="nav-icon">🌐</span> User Portal
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-user-card">
+        <div class="admin-avatar">JD</div>
+        <div class="admin-info">
+          <div class="admin-name">J. Dela Cruz</div>
+          <div class="admin-role">DRRMO Administrator</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="admin-main">
+
+    <!-- TOP BAR -->
+    <header class="admin-topbar">
+      <button class="sidebar-toggle-btn" id="sidebar-toggle-btn" aria-label="Toggle sidebar">☰</button>
+      <div class="topbar-title">DRRMO <span>/ Dashboard Overview</span></div>
+      <div class="topbar-right">
+        <div class="topbar-clock" id="admin-clock" aria-live="polite">Loading…</div>
+        <button class="topbar-notif-btn" title="Notifications" aria-label="Notifications">
+          🔔 <span class="notif-dot"></span>
+        </button>
+        <button class="logout-btn" id="logout-btn">↩ <span>Logout</span></button>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="admin-content">
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div class="admin-tab-panel active" data-panel="overview">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon maroon">📦</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-total">10</div>
+              <div class="stat-label">Total Lost Items</div>
+              <div class="stat-trend">+2 this week</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">📢</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-active">5</div>
+              <div class="stat-label">Active Announcements</div>
+              <div class="stat-trend" style="color:var(--priority-critical)">1 Critical</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">🔍</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-pending">9</div>
+              <div class="stat-label">Unclaimed Items</div>
+              <div class="stat-trend">Awaiting claim</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">✅</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-returned">1</div>
+              <div class="stat-label">Items Returned</div>
+              <div class="stat-trend">This month</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <div class="quick-action-btn" role="button" tabindex="0" onclick="activateSection('announcements')" aria-label="New announcement">
+            <span class="qa-icon">📢</span> New Announcement
+          </div>
+          <div class="quick-action-btn" role="button" tabindex="0" onclick="activateSection('items')" aria-label="Add item">
+            <span class="qa-icon">📦</span> Add Lost Item
+          </div>
+          <div class="quick-action-btn" role="button" tabindex="0" onclick="activateSection('analytics')" aria-label="View analytics">
+            <span class="qa-icon">📈</span> View Analytics
+          </div>
+          <div class="quick-action-btn" role="button" tabindex="0" onclick="window.open('index.html','_blank')" aria-label="View portal">
+            <span class="qa-icon">🌐</span> User Portal
+          </div>
+        </div>
+
+        <!-- Activity -->
+        <div class="activity-card">
+          <div class="activity-card-header">
+            <div class="section-title" style="font-size:15px">
+              <div class="title-icon" style="width:28px;height:28px;font-size:13px">🕐</div>
+              Recent Activity
+            </div>
+            <span style="font-size:12px;color:var(--text-light)">Last 48 hours</span>
+          </div>
+          <div class="activity-list" id="activity-list" role="log" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- ═══ ANALYTICS ═══ -->
+      <div class="admin-tab-panel" data-panel="analytics">
+
+        <!-- Metric Cards -->
+        <div class="analytics-metrics">
+          <div class="metric-card m-maroon">
+            <div class="metric-val" id="an-total-items">10</div>
+            <div class="metric-label">Total Lost Items</div>
+          </div>
+          <div class="metric-card m-orange">
+            <div class="metric-val" id="an-this-week">30</div>
+            <div class="metric-label">Items This Week</div>
+          </div>
+          <div class="metric-card m-green">
+            <div class="metric-val" id="an-found-items">9</div>
+            <div class="metric-label">Unclaimed</div>
+          </div>
+          <div class="metric-card m-blue">
+            <div class="metric-val" id="an-claimed">1</div>
+            <div class="metric-label">Returned</div>
+          </div>
+          <div class="metric-card m-yellow">
+            <div class="metric-val" id="an-total-anns">5</div>
+            <div class="metric-label">Total Alerts</div>
+          </div>
+          <div class="metric-card m-red">
+            <div class="metric-val" id="an-critical-ann">1</div>
+            <div class="metric-label">Critical Alerts</div>
+          </div>
+        </div>
+
+        <!-- Row 1: Bar + Donut -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-card-title">📊 Items Found Per Day</div>
+                <div class="chart-card-sub">Current week</div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap" style="height:200px">
+              <canvas id="chart-weekly" style="width:100%;height:200px"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-card-title">🥧 Alert Priority Mix</div>
+                <div class="chart-card-sub">All active announcements</div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap" style="height:200px">
+              <canvas id="chart-priority" style="width:100%;height:200px"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Line + HBar -->
+        <div class="charts-row-equal">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-card-title">📈 Monthly Lost Items Trend</div>
+                <div class="chart-card-sub">Last 12 months</div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap" style="height:190px">
+              <canvas id="chart-monthly" style="width:100%;height:190px"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div>
+                <div class="chart-card-title">📋 Items by Category</div>
+                <div class="chart-card-sub">All inventory</div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap" style="height:190px">
+              <canvas id="chart-category" style="width:100%;height:190px"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Table -->
+        <div class="admin-panel-card">
+          <div class="admin-panel-card-header">
+            <div class="section-title" style="font-size:15px">
+              <div class="title-icon" style="width:28px;height:28px;font-size:13px">📋</div>
+              Inventory Summary
+            </div>
+            <span style="font-size:12px;color:var(--text-muted)">Auto-generated report</span>
+          </div>
+          <div class="admin-panel-card-body">
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:13px">
+                <thead>
+                  <tr style="background:var(--surface);border-bottom:2px solid var(--border)">
+                    <th style="padding:10px 14px;text-align:left;font-weight:700;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Category</th>
+                    <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Found</th>
+                    <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Claimed</th>
+                    <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Total</th>
+                  </tr>
+                </thead>
+                <tbody id="summary-table-body">
+                  <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 14px">📱 Electronics</td><td style="text-align:center;padding:10px 14px">3</td><td style="text-align:center;padding:10px 14px">0</td><td style="text-align:center;padding:10px 14px"><strong>3</strong></td></tr>
+                  <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 14px">👕 Clothing</td><td style="text-align:center;padding:10px 14px">2</td><td style="text-align:center;padding:10px 14px">0</td><td style="text-align:center;padding:10px 14px"><strong>2</strong></td></tr>
+                  <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 14px">🎒 Bags</td><td style="text-align:center;padding:10px 14px">1</td><td style="text-align:center;padding:10px 14px">0</td><td style="text-align:center;padding:10px 14px"><strong>1</strong></td></tr>
+                  <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 14px">⌚ Accessories</td><td style="text-align:center;padding:10px 14px">2</td><td style="text-align:center;padding:10px 14px">1</td><td style="text-align:center;padding:10px 14px"><strong>3</strong></td></tr>
+                  <tr><td style="padding:10px 14px">📚 School</td><td style="text-align:center;padding:10px 14px">1</td><td style="text-align:center;padding:10px 14px">0</td><td style="text-align:center;padding:10px 14px"><strong>1</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /#analytics -->
+
+      <!-- ═══ ANNOUNCEMENTS ═══ -->
+      <div class="admin-tab-panel" data-panel="announcements">
+
+        <div class="admin-panel-card">
+          <div class="admin-panel-card-header">
+            <div class="section-title" style="font-size:15px">
+              <div class="title-icon" style="width:28px;height:28px;font-size:13px">✍️</div>
+              Create Announcement
+            </div>
+            <span style="font-size:12px;color:var(--text-muted)">Fields marked * required</span>
+          </div>
+          <div class="admin-panel-card-body">
+            <div class="ann-form-inner">
+              <form id="ann-form" novalidate>
+                <div class="form-grid-2" style="margin-bottom:14px">
+                  <div class="form-group">
+                    <label class="form-label" for="ann-event-type">Event / Disaster Type *</label>
+                    <select id="ann-event-type" class="form-control" required>
+                      <option value="" disabled selected>— Select event type —</option>
+                      <option value="Campus Emergency">🚨 Campus Emergency</option>
+                      <option value="Typhoon Warning">🌀 Typhoon Warning</option>
+                      <option value="Earthquake Drill">🌍 Earthquake Drill</option>
+                      <option value="Fire Drill">🔥 Fire Drill</option>
+                      <option value="Class Suspension">📋 Class Suspension</option>
+                      <option value="Health Advisory">🏥 Health Advisory</option>
+                      <option value="Security Alert">🔒 Security Alert</option>
+                      <option value="Holiday Notice">🎉 Holiday Notice</option>
+                      <option value="General Info">ℹ️ General Info</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Priority Level *</label>
+                    <div class="priority-radio-group" role="radiogroup">
+                      <label class="priority-radio-label p-general">
+                        <input type="radio" name="ann-priority" value="general" checked>🟢 General
+                      </label>
+                      <label class="priority-radio-label p-warning">
+                        <input type="radio" name="ann-priority" value="warning">🟡 Warning
+                      </label>
+                      <label class="priority-radio-label p-critical">
+                        <input type="radio" name="ann-priority" value="critical">🔴 Critical
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group" style="margin-bottom:18px">
+                  <label class="form-label" for="ann-note">Announcement Note *</label>
+                  <textarea id="ann-note" class="form-control" rows="5"
+                    placeholder="Write full announcement text. Be clear — include times, locations, and instructions…"
+                    required></textarea>
+                  <div style="font-size:11px;color:var(--text-light);margin-top:4px">
+                    Tip: Selecting an event type will auto-suggest a priority.
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  <button type="submit" class="btn btn-primary ann-submit-btn">📢 Publish Announcement</button>
+                  <button type="reset"  class="btn btn-secondary" id="ann-reset-btn">✕ Clear</button>
+                </div>
+              </form>
+
+              <!-- Live Preview + Priority Guide -->
+              <div>
+                <div class="live-preview-wrap">
+                  <div class="live-preview-label">👁 Live Preview</div>
+                  <div class="preview-ann-card">
+                    <div class="preview-ribbon" id="preview-ribbon" style="height:4px;background:var(--priority-general)"></div>
+                    <div class="preview-body">
+                      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px">
+                        <div class="preview-event" id="preview-event" style="font-size:14px;font-weight:700">Event Type</div>
+                        <span class="badge badge-general" id="preview-badge">🟢 General</span>
+                      </div>
+                      <p class="preview-note" id="preview-note" style="font-size:12px;color:var(--text-muted)">
+                        Your announcement note will appear here as you type…
+                      </p>
+                      <div style="font-size:11px;color:var(--text-light);margin-top:9px">🕐 Just now · Admin · DRRMO</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:12px;background:var(--surface);border-radius:var(--radius-sm);padding:13px;border:1px solid var(--border)">
+                  <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-light);margin-bottom:9px">Priority Color Guide</div>
+                  <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;background:var(--priority-general);border-radius:2px;flex-shrink:0"></span><span><strong>Green</strong> — General, Holidays, Drills</span></div>
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;background:var(--priority-warning);border-radius:2px;flex-shrink:0"></span><span><strong>Orange</strong> — Warnings, Suspensions</span></div>
+                    <div style="display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;background:var(--priority-critical);border-radius:2px;flex-shrink:0"></span><span><strong>Red</strong> — Emergencies, Evacuations</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Published List -->
+        <div class="admin-panel-card">
+          <div class="admin-panel-card-header">
+            <div class="section-title" style="font-size:15px">
+              <div class="title-icon" style="width:28px;height:28px;font-size:13px">📋</div>
+              Published Announcements
+            </div>
+            <span style="font-size:12px;color:var(--text-muted)" id="ann-count-label">5 announcements</span>
+          </div>
+          <div class="admin-panel-card-body" style="padding-top:12px">
+            <div id="admin-ann-list" role="list"></div>
+          </div>
+        </div>
+
+      </div><!-- /#announcements -->
+
+      <!-- ═══ LOST ITEMS ═══ -->
+      <div class="admin-tab-panel" data-panel="items">
+
+        <!-- Add Item Form -->
+        <div class="admin-panel-card">
+          <div class="admin-panel-card-header">
+            <div class="section-title" style="font-size:15px">
+              <div class="title-icon" style="width:28px;height:28px;font-size:13px">➕</div>
+              Add Lost Item to Inventory
+            </div>
+            <span style="font-size:12px;color:var(--text-muted)">All fields required</span>
+          </div>
+          <div class="admin-panel-card-body">
+            <form id="add-item-form" novalidate>
+              <div class="form-grid-3" style="margin-bottom:14px">
+                <div class="form-group">
+                  <label class="form-label" for="item-name">Item Name *</label>
+                  <input type="text" id="item-name" class="form-control" placeholder="e.g. Blue Backpack" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="item-date">Date Found *</label>
+                  <input type="date" id="item-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="item-location">Location Found *</label>
+                  <input type="text" id="item-location" class="form-control" placeholder="e.g. Library – 2nd Floor" required>
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:14px">
+                <label class="form-label" for="item-desc">Description *</label>
+                <textarea id="item-desc" class="form-control" rows="3"
+                  placeholder="Color, brand, condition, distinguishing features…" required></textarea>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px">
+                <!-- Upload -->
+                <div class="form-group">
+                  <label class="form-label">Item Photo (Click or Drag &amp; Drop)</label>
+                  <div class="file-upload-area" id="upload-area">
+                    <input type="file" id="item-image-input" accept="image/*" aria-label="Upload item photo">
+                    <div id="upload-placeholder">
+                      <div class="file-upload-icon">📷</div>
+                      <div class="file-upload-label">
+                        <span>Click to upload</span> or drag &amp; drop<br>
+                        <span style="font-size:11px">PNG, JPG, WEBP — Max 8 MB</span>
+                      </div>
+                    </div>
+                    <img src="" alt="Preview" class="file-preview-img" id="item-img-preview">
+                  </div>
+                  <div id="upload-filename" style="font-size:11px;color:var(--text-muted);margin-top:5px"></div>
+                </div>
+                <!-- Tags -->
+                <div class="form-group">
+                  <label class="form-label" for="tag-input">Keyword Tags</label>
+                  <div class="tag-input-row">
+                    <input type="text" id="tag-input" class="form-control"
+                      placeholder="e.g. Blue, Backpack, Canvas…" aria-label="Add tag">
+                    <button type="button" id="tag-add-btn" class="btn btn-primary btn-sm">+ Add</button>
+                  </div>
+                  <div style="font-size:11px;color:var(--text-light);margin-top:5px">
+                    Press Enter or click Add. Click a tag to remove it.
+                  </div>
+                  <div class="tag-preview-row" id="tag-preview-row" role="list"></div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button type="submit" class="btn btn-primary">📦 Add to Inventory</button>
+                <button type="reset"  class="btn btn-secondary" id="item-reset-btn">✕ Clear</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Inventory Grid -->
+        <div class="admin-panel-card">
+          <div class="admin-panel-card-header">
+            <div class="section-title" style="font-size:15px">
+              <div class="title-icon" style="width:28px;height:28px;font-size:13px">🗃️</div>
+              Item Inventory
+            </div>
+            <div class="admin-item-search-row">
+              <span style="font-size:12px;color:var(--text-muted)" id="items-inv-count">10 items</span>
+              <div class="search-wrap">
+                <span>🔍</span>
+                <input type="search" id="admin-item-search" class="form-control"
+                  placeholder="Search inventory…" style="font-size:13px;width:180px"
+                  aria-label="Search inventory">
+              </div>
+            </div>
+          </div>
+          <div class="admin-panel-card-body">
+            <div id="admin-items-grid" role="list"></div>
+          </div>
+        </div>
+
+      </div><!-- /#items -->
+
+      <!-- ═══ SETTINGS ═══ -->
+      <div class="admin-tab-panel" data-panel="settings">
+        <div class="admin-panel-card" style="margin-bottom:20px">
+          <div class="admin-panel-card-header">
+            <div class="section-title" style="font-size:15px">
+              <div class="title-icon" style="width:28px;height:28px;font-size:13px">⚙️</div>
+              System Settings
+            </div>
+          </div>
+          <div class="admin-panel-card-body">
+            <div class="settings-section">
+              <div class="settings-card">
+                <h3>🔔 Notifications</h3>
+                <div class="toggle-row"><span>Enable Emergency Alerts</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><span>Critical Banner Auto-Dismiss</span><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><span>Email Notifications</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><span>SMS Alerts (Simulated)</span><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></div>
+              </div>
+              <div class="settings-card">
+                <h3>🗓️ Item Retention Policy</h3>
+                <div class="form-group" style="margin-bottom:12px">
+                  <label class="form-label">Unclaimed Item Hold Period</label>
+                  <select class="form-control"><option>30 days</option><option selected>60 days</option><option>90 days</option></select>
+                </div>
+                <div class="toggle-row"><span>Auto-archive Claimed Items</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><span>Allow Public Item Requests</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+              </div>
+              <div class="settings-card">
+                <h3>👤 Admin Account</h3>
+                <div class="form-group" style="margin-bottom:12px">
+                  <label class="form-label">Display Name</label>
+                  <input type="text" class="form-control" value="J. Dela Cruz">
+                </div>
+                <div class="form-group" style="margin-bottom:12px">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" class="form-control" value="admin@drrmo.ZPPSU.edu.ph">
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="showToast('Settings saved.','success')">💾 Save Changes</button>
+              </div>
+              <div class="settings-card">
+                <h3>🎨 Portal Appearance</h3>
+                <div class="toggle-row"><span>Show Hero Banner</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                <div class="toggle-row"><span>Enable Ticker</span><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+                <div class="form-group" style="margin-top:12px">
+                  <label class="form-label">Institution Name</label>
+                  <input type="text" class="form-control" value="ZPPSU DRRMO">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="admin-panel-card">
+          <div class="admin-panel-card-header">
+            <div class="section-title" style="font-size:15px">
+              <div class="title-icon" style="width:28px;height:28px;font-size:13px">ℹ️</div>System Information
+            </div>
+          </div>
+          <div class="admin-panel-card-body">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:13px">
+              <div><span style="color:var(--text-muted)">System Version:</span><br><strong>v1.0.0 (Capstone Demo)</strong></div>
+              <div><span style="color:var(--text-muted)">Environment:</span><br><strong>Frontend-Only / XAMPP</strong></div>
+              <div><span style="color:var(--text-muted)">Last Updated:</span><br><strong>March 2, 2026</strong></div>
+              <div><span style="color:var(--text-muted)">Build Stack:</span><br><strong>HTML5 · CSS3 · Vanilla JS</strong></div>
+              <div><span style="color:var(--text-muted)">Admin Session:</span><br><strong>admin@192.168.1.1</strong></div>
+              <div><span style="color:var(--text-muted)">Data Storage:</span><br><strong>In-memory (Mock State)</strong></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /#settings -->
+
+    </div><!-- /.admin-content -->
+  </div><!-- /.admin-main -->
+
+  <!-- ── MOBILE BOTTOM NAV ── -->
+  <nav class="mobile-bottom-nav" role="navigation" aria-label="Mobile navigation">
+    <div class="mobile-bottom-nav-inner">
+      <button class="mob-nav-btn active" data-section="overview"       aria-label="Overview">
+        <span class="mob-icon">📊</span>Overview
+      </button>
+      <button class="mob-nav-btn" data-section="analytics"             aria-label="Analytics">
+        <span class="mob-icon">📈</span>Analytics
+      </button>
+      <button class="mob-nav-btn" data-section="announcements"         aria-label="Alerts">
+        <span class="mob-icon">📢</span>Alerts
+      </button>
+      <button class="mob-nav-btn" data-section="items"                 aria-label="Items">
+        <span class="mob-icon">📦</span>Items
+      </button>
+      <button class="mob-nav-btn" data-section="settings"              aria-label="Settings">
+        <span class="mob-icon">⚙️</span>Settings
+      </button>
+    </div>
+  </nav>
+
+</div><!-- /#admin-dashboard -->
+
+<div id="toast-container" role="status" aria-live="polite"></div>
+
+<script src="js/app.js"></script>
+<script>
+/* ── Login Gate ── */
+(function () {
+  const gate = document.getElementById('login-gate');
+  const dash = document.getElementById('admin-dashboard');
+  const form = document.getElementById('login-form');
+  const errEl= document.getElementById('login-error');
+
+  /* Pre-fill for demo */
+  document.getElementById('login-username').value = 'admin';
+  document.getElementById('login-password').value = 'drrmo2026';
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const u = document.getElementById('login-username').value.trim();
+    const p = document.getElementById('login-password').value;
+    if (u === 'admin' && p === 'drrmo2026') {
+      gate.style.display = 'none';
+      dash.style.display = 'flex';
+      if (typeof initAdminDashboardOnce === 'function') initAdminDashboardOnce();
+    } else {
+      errEl.style.display = 'block';
+      document.getElementById('login-password').value = '';
+      setTimeout(() => { errEl.style.display = 'none'; }, 3000);
+    }
+  });
+})();
+
+/* ── Admin inventory search ── */
+document.addEventListener('DOMContentLoaded', function () {
+  /* Inventory search filter */
+  document.getElementById('admin-item-search')?.addEventListener('input', function () {
+    const q = this.value.trim().toLowerCase();
+    document.querySelectorAll('.admin-item-card').forEach(card => {
+      const name = card.querySelector('.admin-item-name')?.textContent.toLowerCase() || '';
+      const loc  = card.querySelector('.admin-item-location')?.textContent.toLowerCase() || '';
+      card.style.display = (!q || name.includes(q) || loc.includes(q)) ? '' : 'none';
+    });
+    /* Update count */
+    const vis = document.querySelectorAll('.admin-item-card:not([style*="display: none"])').length;
+    const el = document.getElementById('items-inv-count');
+    if (el) el.textContent = `${vis} item${vis !== 1 ? 's' : ''}`;
+  });
+
+  /* File name display */
+  document.getElementById('item-image-input')?.addEventListener('change', function () {
+    const fnEl = document.getElementById('upload-filename');
+    if (fnEl && this.files[0]) fnEl.textContent = `📎 ${this.files[0].name} (${(this.files[0].size/1024).toFixed(1)} KB)`;
+  });
+
+  /* Announcement reset restores submit text */
+  document.getElementById('ann-reset-btn')?.addEventListener('click', function () {
+    const btn = document.querySelector('.ann-submit-btn');
+    if (btn) { delete btn.dataset.editId; btn.textContent = '📢 Publish Announcement'; }
+    if (typeof updateLivePreview === 'function') setTimeout(updateLivePreview, 10);
+  });
+
+  /* Item reset clears image state */
+  document.getElementById('item-reset-btn')?.addEventListener('click', function () {
+    const prev = document.getElementById('item-img-preview');
+    const ph   = document.getElementById('upload-placeholder');
+    const fn   = document.getElementById('upload-filename');
+    if (prev) { prev.src = ''; prev.style.display = 'none'; }
+    if (ph)   ph.style.display = '';
+    if (fn)   fn.textContent = '';
+    if (typeof State !== 'undefined') { State.addItemTags = []; State.addItemImage = null; }
+    const tagRow = document.getElementById('tag-preview-row');
+    if (tagRow) tagRow.innerHTML = '';
+  });
+
+  /* Live announcement count label & nav badge */
+  const annList = document.getElementById('admin-ann-list');
+  if (annList) {
+    new MutationObserver(() => {
+      const n = annList.querySelectorAll('.ann-list-item').length;
+      const lbl = document.getElementById('ann-count-label');
+      const bdg = document.getElementById('ann-nav-badge');
+      if (lbl) lbl.textContent = `${n} announcement${n !== 1 ? 's' : ''}`;
+      if (bdg) bdg.textContent = n;
+    }).observe(annList, { childList: true, subtree: true });
+  }
+
+  /* Live inventory count label */
+  const adminGrid = document.getElementById('admin-items-grid');
+  const invCount  = document.getElementById('items-inv-count');
+  if (adminGrid && invCount) {
+    new MutationObserver(() => {
+      const n = adminGrid.querySelectorAll('.admin-item-card').length;
+      invCount.textContent = `${n} item${n !== 1 ? 's' : ''}`;
+    }).observe(adminGrid, { childList: true, subtree: true });
+  }
+
+  /* Keyboard nav for sidebar items */
+  document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); item.click(); }
+    });
+  });
+});
+</script>
+</body>
+</html>

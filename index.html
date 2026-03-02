@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="rgb(40,9,5)">
+  <title>ZPPSU DRRMO – Lost &amp; Found and Announcement System</title>
+  <meta name="description" content="Zamboanga Peninsula Polytechnic State University DRRMO — Real-time emergency alerts and lost item registry.">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ── User Portal inline extras ── */
+    .hero-banner {
+      background: linear-gradient(135deg, rgb(40,9,5) 0%, rgb(116,10,3) 55%, rgb(160,14,8) 100%);
+      padding: 56px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-banner::before {
+      content:'';
+      position:absolute; top:-60px; right:-60px;
+      width:300px; height:300px; border-radius:50%;
+      background:radial-gradient(circle,rgba(230,80,27,.3) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .hero-banner::after {
+      content:'';
+      position:absolute; bottom:-80px; left:-40px;
+      width:240px; height:240px; border-radius:50%;
+      background:radial-gradient(circle,rgba(195,17,12,.2) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .hero-inner { position:relative; z-index:1; max-width:680px; margin:0 auto; }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:7px;
+      background:rgba(230,80,27,.2); border:1px solid rgba(230,80,27,.45);
+      color:#ffcaa0; padding:5px 14px; border-radius:20px;
+      font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;
+      margin-bottom:18px;
+    }
+    .hero-title {
+      font-size:36px; font-weight:900; color:#fff; line-height:1.15;
+      margin-bottom:14px; letter-spacing:-.4px;
+    }
+    .hero-title span { color:#ffb088; }
+    .hero-subtitle { font-size:15px; color:rgba(255,255,255,.65); margin-bottom:26px; line-height:1.7; }
+    .hero-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .hero-stats {
+      display:flex; gap:28px; justify-content:center; margin-top:36px;
+      padding-top:28px; border-top:1px solid rgba(255,255,255,.1); flex-wrap:wrap;
+    }
+    .hero-stat { text-align:center; }
+    .hero-stat-num { font-size:26px; font-weight:800; color:#fff; }
+    .hero-stat-label { font-size:11px; color:rgba(255,255,255,.45); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
+
+    /* Critical alert banner */
+    .critical-alert-banner {
+      background:linear-gradient(90deg, rgb(116,10,3), rgb(195,17,12));
+      color:#fff; padding:11px 24px;
+      display:flex; align-items:center; gap:12px; font-size:13px; font-weight:600;
+    }
+    .alert-icon { font-size:18px; animation:shake .5s ease-in-out infinite alternate; flex-shrink:0; }
+    @keyframes shake { from{transform:rotate(-12deg);} to{transform:rotate(12deg);} }
+    .alert-text { flex:1; }
+    .alert-dismiss { cursor:pointer; opacity:.7; font-size:17px; padding:2px 6px; flex-shrink:0; }
+    .alert-dismiss:hover { opacity:1; }
+
+    /* How It Works */
+    .how-it-works {
+      background: linear-gradient(135deg, rgb(40,9,5) 0%, rgb(90,8,3) 100%);
+      padding: 44px 24px;
+    }
+    .how-it-works-inner { max-width:1280px; margin:0 auto; }
+    .how-it-works h2 { color:#fff; text-align:center; font-size:22px; font-weight:800; margin-bottom:28px; }
+    .steps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .step-card {
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.09);
+      border-radius:var(--radius); padding:26px 20px; text-align:center;
+    }
+    .step-num {
+      width:42px; height:42px; border-radius:50%;
+      background:linear-gradient(135deg,var(--navy-light),var(--blue));
+      color:#fff; font-size:17px; font-weight:800;
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 12px; box-shadow:0 2px 10px rgba(230,80,27,.4);
+    }
+    .step-title { font-size:14px; font-weight:700; color:#fff; margin-bottom:7px; }
+    .step-desc  { font-size:12px; color:rgba(255,255,255,.5); line-height:1.6; }
+
+    @media (max-width:768px) {
+      .hero-title { font-size:24px; }
+      .hero-banner { padding:36px 16px 32px; }
+      .steps-grid { grid-template-columns:1fr; }
+      .hero-stats { gap:18px; }
+      .how-it-works { padding:32px 16px; }
+      .critical-alert-banner { padding:10px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="user-portal">
+
+  <!-- ══ HEADER ══ -->
+  <header class="portal-header" role="banner">
+    <div class="portal-header-brand">
+      <div class="header-logo-group">
+        <img src="assets/zppsu-logo.png" alt="ZPPSU Logo" class="header-logo">
+        <div class="header-logo-divider" aria-hidden="true"></div>
+        <img src="assets/drrmo-logo.png" alt="DRRMO Logo" class="header-logo">
+      </div>
+      <div>
+        <div class="header-org-name">ZPPSU — Zamboanga City · DRRMO</div>
+        <div class="header-system-name">Integrated L&amp;F · Announcement System</div>
+      </div>
+    </div>
+
+    <div class="portal-header-center">
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="#section-announcements" class="active">Announcements</a>
+        <a href="#section-lostandfound">Lost &amp; Found</a>
+        <a href="#section-contact">Contact</a>
+        <a href="admin.html">Admin Portal</a>
+      </nav>
+    </div>
+
+    <div class="portal-header-right">
+      <div class="live-badge" aria-label="System live">
+        <span class="live-dot"></span>LIVE
+      </div>
+      <div class="live-clock" id="header-clock" aria-live="polite">Loading…</div>
+    </div>
+  </header>
+
+  <!-- ══ CRITICAL BANNER ══ -->
+  <div class="critical-alert-banner" id="critical-banner" role="alert">
+    <span class="alert-icon" aria-hidden="true">🚨</span>
+    <span class="alert-text">
+      <strong>ACTIVE EMERGENCY:</strong> Fire alarm triggered in Building C — All personnel must evacuate immediately. Proceed to the oval assembly area.
+    </span>
+    <span class="alert-dismiss" id="dismiss-banner" role="button" aria-label="Dismiss alert" tabindex="0">✕</span>
+  </div>
+
+  <!-- ══ TICKER ══ -->
+  <div class="ticker-bar" id="ticker-bar" role="marquee" aria-label="Live alerts">
+    <div class="ticker-label">📡 LIVE ALERTS</div>
+    <div class="ticker-track">
+      <span class="ticker-inner" id="ticker-inner">Loading announcements…</span>
+    </div>
+  </div>
+
+  <!-- ══ HERO ══ -->
+  <section class="hero-banner" aria-label="Welcome banner">
+    <div class="hero-inner">
+      <div class="hero-badge">🛡️ Disaster Risk Reduction &amp; Management Office</div>
+      <h1 class="hero-title">
+        Campus Safety &amp;<br>
+        <span>Lost &amp; Found</span> Hub
+      </h1>
+      <p class="hero-subtitle">
+        Real-time emergency alerts, drill announcements, and a centralized lost item registry — keeping the entire ZPPSU community informed and safe.
+      </p>
+      <div class="hero-actions">
+        <a href="#section-announcements" class="btn btn-primary">📢 View Alerts</a>
+        <a href="#section-lostandfound"  class="btn btn-secondary" style="color:#fff;border-color:rgba(255,255,255,.3)">🔍 Search Lost Items</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">5</div><div class="hero-stat-label">Active Alerts</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">10</div><div class="hero-stat-label">Lost Items</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">1</div><div class="hero-stat-label">Critical</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">24/7</div><div class="hero-stat-label">Monitoring</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PORTAL BODY ══ -->
+  <main class="portal-body">
+
+    <!-- ── ANNOUNCEMENTS ── -->
+    <section class="portal-section" id="section-announcements" aria-labelledby="ann-title">
+      <div class="portal-section-header">
+        <div class="section-title" id="ann-title">
+          <div class="title-icon" aria-hidden="true">📢</div>
+          Active Announcements &amp; Alerts
+        </div>
+        <div class="filter-tabs" role="tablist" aria-label="Filter by priority">
+          <button class="filter-tab active" data-filter="all"      role="tab">All <span class="tab-count">5</span></button>
+          <button class="filter-tab" data-filter="critical" role="tab" style="color:var(--priority-critical)">🔴 Critical <span class="tab-count">1</span></button>
+          <button class="filter-tab" data-filter="warning"  role="tab" style="color:var(--priority-warning)">🟡 Warning  <span class="tab-count">2</span></button>
+          <button class="filter-tab" data-filter="general"  role="tab" style="color:var(--priority-general)">🟢 General  <span class="tab-count">2</span></button>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:12px;color:var(--text-muted);align-items:center">
+        <span style="font-weight:700;text-transform:uppercase;letter-spacing:.4px">Priority:</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;background:var(--priority-critical);border-radius:2px;display:inline-block"></span>Red — Critical Emergency</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;background:var(--priority-warning);border-radius:2px;display:inline-block"></span>Orange — Warning / Drill</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="width:11px;height:11px;background:var(--priority-general);border-radius:2px;display:inline-block"></span>Green — General / Holiday</span>
+      </div>
+
+      <div id="announcements-grid" aria-live="polite"></div>
+    </section>
+
+    <!-- ── LOST & FOUND ── -->
+    <section class="portal-section" id="section-lostandfound" aria-labelledby="lf-title">
+      <div class="portal-section-header">
+        <div class="section-title" id="lf-title">
+          <div class="title-icon" aria-hidden="true">🔍</div>
+          Lost &amp; Found Registry
+        </div>
+        <span style="font-size:13px;color:var(--text-muted)">
+          Showing <strong id="items-count">10</strong> items
+        </span>
+      </div>
+
+      <div class="search-bar-row">
+        <div class="search-input-wrap">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input type="search" id="item-search" class="form-control"
+            placeholder="Search by name, description, location or keyword…"
+            aria-label="Search lost items" autocomplete="off">
+        </div>
+        <button class="btn btn-secondary" id="clear-filters-btn" type="button">✕ Clear</button>
+      </div>
+
+      <div class="tag-filter-row" role="group" aria-label="Filter by tag">
+        <span class="tag-filter-label">Filter:</span>
+        <button class="tag-pill-user" data-tag="Blue"        type="button">🔵 Blue</button>
+        <button class="tag-pill-user" data-tag="Red"         type="button">🔴 Red</button>
+        <button class="tag-pill-user" data-tag="Black"       type="button">⚫ Black</button>
+        <button class="tag-pill-user" data-tag="Gray"        type="button">🩶 Gray</button>
+        <button class="tag-pill-user" data-tag="Yellow"      type="button">🟡 Yellow</button>
+        <button class="tag-pill-user" data-tag="Green"       type="button">🟢 Green</button>
+        <button class="tag-pill-user" data-tag="White"       type="button">⚪ White</button>
+        <button class="tag-pill-user" data-tag="Electronics" type="button">📱 Electronics</button>
+        <button class="tag-pill-user" data-tag="Clothing"    type="button">👕 Clothing</button>
+        <button class="tag-pill-user" data-tag="Accessories" type="button">⌚ Accessories</button>
+        <button class="tag-pill-user" data-tag="School"      type="button">📚 School</button>
+        <button class="tag-pill-user" data-tag="Backpack"    type="button">🎒 Backpack</button>
+      </div>
+
+      <div id="items-grid" aria-live="polite"></div>
+    </section>
+
+  </main>
+
+  <!-- ══ HOW IT WORKS ══ -->
+  <section class="how-it-works" id="section-contact">
+    <div class="how-it-works-inner">
+      <h2>How to Claim a Lost Item</h2>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-title">Search the Registry</div>
+          <div class="step-desc">Use the search bar and tag filters above to find your lost item by color, category, or location.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-title">Visit DRRMO Office</div>
+          <div class="step-desc">Bring a valid school ID to the Lost &amp; Found office — Admin Building, Room 104. Open Mon–Fri, 7 AM–6 PM.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-title">Claim Your Item</div>
+          <div class="step-desc">Present proof of ownership. The officer will verify, release the item, and log it in the claim register.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="portal-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="footer-col-title">ZPPSU DRRMO</div>
+        <p>Zamboanga Peninsula Polytechnic State University<br>
+           Disaster Risk Reduction &amp; Management Office<br>
+           Administration Building, Room 104<br>
+           Open: Mon–Fri, 7:00 AM – 6:00 PM</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Emergency Contacts</div>
+        <ul>
+          <li>☎ DRRMO Hotline: <strong style="color:#fff">555-0100</strong></li>
+          <li>🚒 Fire: <strong style="color:#fff">555-0101</strong></li>
+          <li>🚑 Medical: <strong style="color:#fff">555-0102</strong></li>
+          <li>🚔 Security: <strong style="color:#fff">555-0103</strong></li>
+          <li>📧 drrmo@ZPPSU.edu.ph</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Quick Links</div>
+        <ul>
+          <li><a href="#section-announcements" style="color:rgba(255,255,255,.6)">📢 Announcements</a></li>
+          <li><a href="#section-lostandfound"  style="color:rgba(255,255,255,.6)">🔍 Lost &amp; Found</a></li>
+          <li><a href="admin.html"             style="color:rgba(255,255,255,.6)">⚙️ Admin Portal</a></li>
+          <li><a href="#section-contact"       style="color:rgba(255,255,255,.6)">ℹ️ How to Claim</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 ZPPSU DRRMO Integrated System — Zamboanga City · Capstone Prototype
+    </div>
+  </footer>
+
+</div><!-- /#user-portal -->
+
+<div id="toast-container" role="status" aria-live="polite"></div>
+
+<script src="js/app.js"></script>
+<script>
+  /* Dismiss critical banner */
+  const dismissBtn = document.getElementById('dismiss-banner');
+  const banner     = document.getElementById('critical-banner');
+  if (dismissBtn && banner) {
+    dismissBtn.addEventListener('click', () => banner.style.display='none');
+    dismissBtn.addEventListener('keydown', e => { if(e.key==='Enter') banner.style.display='none'; });
+  }
+  /* Update items count dynamically */
+  document.addEventListener('DOMContentLoaded', () => {
+    const countEl = document.getElementById('items-count');
+    const grid    = document.getElementById('items-grid');
+    if (countEl && grid) {
+      new MutationObserver(() => {
+        countEl.textContent = grid.querySelectorAll('.item-card').length;
+      }).observe(grid, { childList:true, subtree:true });
+    }
+  });
+</script>
+</body>
+</html>
